@@ -60,7 +60,7 @@ export default class CheckoutProcess {
   calculateOrderTotal() {
     // calculate the shipping and tax amounts. Then use them to along with the cart total to figure out the order total
     this.tax = this.itemTotal * 0.06;
-    this.shipping = 10 + (this.list.length - 1) + 2;
+    this.shipping = 10 + (this.list.length - 1) * 2;
     this.orderTotal =
       parseFloat(this.itemTotal) +
       parseFloat(this.tax) +

@@ -68,3 +68,10 @@ export async function loadHeaderFooter() {
   renderWithTemplate(headerTemplate, headerElement);
   renderWithTemplate(footerTemplate, footerElement);
 }
+export function updateCartCount() {
+  const cartItems = JSON.parse(localStorage.getItem("so-cart")) || [];
+  const cartCountElement = document.getElementById("cart-count");
+  if (cartCountElement) {
+    cartCountElement.textContent = cartItems.length;
+  }
+}
