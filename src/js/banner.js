@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-      console.log("El DOM está listo, ejecutando banner.js"); // ← Verifica si aparece en la consola
+  //console.log("El DOM está listo, ejecutando banner.js"); // ← Verifica si aparece en la consola
 
   // Check if banner has been shown before
   if (!localStorage.getItem("bannerShown")) {
@@ -42,10 +42,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(banner);
 
     // Close button handler
-    document.getElementById("close-banner").addEventListener("click", function () {
-      banner.style.display = "none";
-      // Save in localStorage so banner doesn't show again
-      localStorage.setItem("bannerShown", "true");
-    });
+    document
+      .getElementById("close-banner")
+      .addEventListener("click", function () {
+        banner.style.display = "none";
+        // Save in localStorage so banner doesn't show again
+        localStorage.setItem("bannerShown", "true");
+      });
   }
 });
