@@ -19,11 +19,28 @@ export default class ProductDetails {
       .addEventListener("click", this.addProductToCart.bind(this));
   }
 
-  addProductToCart() {
-    const cartItems = getLocalStorage("so-cart") || [];
-    cartItems.push(this.product);
-    setLocalStorage("so-cart", cartItems);
+
+  // ec -- added lines 23 to 43 to check for duplicate items in cart
+ addProductToCart() {
+  const cartItems = getLocalStorage("so-cart") || [];
+
+  // Check if product already exists in cart
+  const existingItem = cartItems.find(item => item.Id === this.product.Id);
+
+  if (existingItem) {
+    // If found, increment quantity +1
+    existingItem.quantity = (existingItem.quantity || 1) + 1;
+  } else {
+    // If not found, add with quantity 1
+    const productToAdd = {
+      ...this.product,
+      quantity: 1
+    };
+    cartItems.push(productToAdd);
   }
+
+  setLocalStorage("so-cart", cartItems);
+}
 
   renderProductDetails() {
     productDetailsTemplate(this.product);
@@ -49,4 +66,26 @@ function productDetailsTemplate(product) {
     product.DescriptionHtmlSimple;
 
   document.querySelector("#add-to-cart").dataset.id = product.Id;
+}
+
+// ec-- added these lines 71 - 91; add safe checks 
+// by errors from missing or differently named fields and ensures the cart always displays something.
+function cartItemTemplate(item) {
+  const name = item.Name || item.NameWithoutBrand || "Unnamed product";
+  const image = item.Image || item.Images?.PrimaryMedium || "../images/default.jpg";
+  const color = item.Colors?.[0]?.ColorName || "N/A";
+
+// ec -- modified line 88 to update hardcoded quantity display 
+// to allow flexibility and show actual quantity
+  return `<li class="cart-card divider">
+    <a href="#" class="cart-card__image">
+      <img src="${item.Image}" alt="${item.Name}" />
+    </a>
+    <a href="#">
+      <h2 class="card__name">${item.Name}</h2>
+    </a>
+    <p class="cart-card__color">${item.Colors[0].ColorName}</p>  
+    <p class="cart-card__quantity">qty: ${item.quantity || 1}</p>
+    <p class="cart-card__price">$${item.FinalPrice}</p>
+  </li>`;
 }

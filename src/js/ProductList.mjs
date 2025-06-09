@@ -13,24 +13,40 @@ function productCardTemplate(product) {
     `;
 }
 
+// ec -- modified this section lines 16 to 23
 export default class ProductList {
   constructor(category, dataSource, listElement) {
     this.category = category;
     this.dataSource = dataSource;
     this.listElement = listElement;
+    this.products = [];  // stores products to avoid re-fetching
   }
 
-  async init() {
-    const list = await this.dataSource.getData(this.category);
-    this.renderList(list);
-    document.querySelector(".title").textContent = this.category;
+
+// ec -- added lines 26 to 51; To sort the product list
+async init() {
+    const products = await this.dataSource.getData(this.category);
+    this.products = products;
+    this.render("name"); // default sort
   }
 
-  renderList(list) {
-    // const htmlStrings = list.map(productCardTemplate);
-    // this.listElement.insertAdjacentHTML("afterbegin", htmlStrings.join(""));
+  // render takes sort method
+  render(sortBy) {
+    let sorted = [...this.products]; // do not mutate original array
 
-    // apply use new utility function instead of the commented code above
-    renderListWithTemplate(productCardTemplate, this.listElement, list);
+    // Clear list before inserting new items
+    this.listElement.innerHTML = "";
+
+    // Sort by selected option
+    if (sortBy === "name") {
+      sorted.sort((a, b) =>
+        a.NameWithoutBrand.toLowerCase().localeCompare(b.NameWithoutBrand.toLowerCase())
+      );
+    } else if (sortBy === "price") {
+      sorted.sort((a, b) => a.FinalPrice - b.FinalPrice);
+    }
+
+    renderListWithTemplate(productCardTemplate, this.listElement, sorted);
   }
-}
+} 
+
