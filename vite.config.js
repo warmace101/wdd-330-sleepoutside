@@ -1,6 +1,5 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
-import ProductList from "./src/js/ProductList.mjs";
 
 export default defineConfig({
   root: "src/",
