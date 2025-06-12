@@ -10,25 +10,62 @@ function convertToJson(res) {
 }
 
 export default class ExternalServices {
-  constructor() {
-    // this.category = category;
-    // this.path = `../public/json/${this.category}.json`;
-  }
+  constructor() {}
+
   async getData(category) {
     const response = await fetch(`${baseURL}products/search/${category}`);
     const data = await convertToJson(response);
-
     return data.Result;
   }
 
   async findProductById(id) {
     const response = await fetch(`${baseURL}product/${id}`);
     const data = await convertToJson(response);
-    //console.log(data.Result);
     return data.Result;
   }
 
-  async checkout(payload) {
+  // Search Products
+  async searchProducts(query, category = "") {
+  let results = [];
+
+  try {
+    // If there's a category, fetch all products under that category
+    if (category) {
+      //console.log(`Fetching by category: ${category}`);
+      const response = await fetch(`${baseURL}products/search/${encodeURIComponent(category)}`);
+      const data = await convertToJson(response);
+      const allInCategory = data.Result || [];
+
+      if (query) {
+        const queryLower = query.toLowerCase();
+
+        // Filter locally
+        results = allInCategory.filter(p =>
+          p.Name.toLowerCase().includes(queryLower) ||
+          (p.NameWithoutBrand && p.NameWithoutBrand.toLowerCase().includes(queryLower)) ||
+          (p.Brand?.Name?.toLowerCase().includes(queryLower)) ||
+          (p.DescriptionHtmlSimple?.toLowerCase().includes(queryLower))
+        );
+
+        //console.log(`Filtered ${results.length} results for query "${query}" in category "${category}"`);
+      } else {
+        results = allInCategory;
+      }
+    } else if (query) {
+      // If no category, try backend search by name
+      //console.log(`Fetching by search query only: ${query}`);
+      const response = await fetch(`${baseURL}products/search/${encodeURIComponent(query)}`);
+      const data = await convertToJson(response);
+      results = data.Result || [];
+    }
+  } catch (err) {
+    //console.error("Search fetch failed:", err);
+  }
+
+  return results;
+}
+
+async checkout(payload) {
     const options = {
       method: "POST",
       headers: {
