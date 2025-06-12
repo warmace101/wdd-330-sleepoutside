@@ -2,18 +2,26 @@
 export function qs(selector, parent = document) {
   return parent.querySelector(selector);
 }
-// or a more concise version if you are into that sort of thing:
-// export const qs = (selector, parent = document) => parent.querySelector(selector);
 
+//ec-added these lines 6 - 12, to This ensures that getLocalStorage("so-cart") always returns 
+// a usable array—even if localStorage is empty, null, or corrupted.
 // retrieve data from localstorage
 export function getLocalStorage(key) {
-  return JSON.parse(localStorage.getItem(key));
+  const value = JSON.parse(localStorage.getItem(key));
+  return Array.isArray(value) ? value : [];
 }
-// save data to local storage
+
+// to save data to local storage
 export function setLocalStorage(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
-// set a listener for both touchend and click
+
+// to clear data from local storage (optional utility)
+export function clearLocalStorage(key) {
+  localStorage.removeItem(key);
+}
+
+// to set a listener for both touchend and click
 export function setClick(selector, callback) {
   qs(selector).addEventListener("touchend", (event) => {
     event.preventDefault();
@@ -22,7 +30,7 @@ export function setClick(selector, callback) {
   qs(selector).addEventListener("click", callback);
 }
 
-// get the product id from the query string
+// to get the product id from the query string
 export function getParam(param) {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
@@ -38,7 +46,6 @@ export function renderListWithTemplate(
   clear = false,
 ) {
   const htmlStrings = list.map(template);
-  // if clear is true we need to clear out the contents of the parent.
   if (clear) {
     parentElement.innerHTML = "";
   }
@@ -68,10 +75,16 @@ export async function loadHeaderFooter() {
   renderWithTemplate(headerTemplate, headerElement);
   renderWithTemplate(footerTemplate, footerElement);
 }
+
+// updated to reflect total quantity, not just unique items
 export function updateCartCount() {
-  const cartItems = JSON.parse(localStorage.getItem("so-cart")) || [];
+  const cartItems = getLocalStorage("so-cart");
   const cartCountElement = document.getElementById("cart-count");
   if (cartCountElement) {
-    cartCountElement.textContent = cartItems.length;
+    const totalQuantity = cartItems.reduce(
+      (sum, item) => sum + (item.quantity || 1),
+      0
+    );
+    cartCountElement.textContent = totalQuantity;
   }
 }

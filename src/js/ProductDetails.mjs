@@ -1,4 +1,5 @@
-import { getLocalStorage, setLocalStorage } from "./utils.mjs";
+import { getLocalStorage, setLocalStorage, updateCartCount } from "./utils.mjs";
+//import { getLocalStorage, setLocalStorage } from "./utils.mjs";
 
 export default class ProductDetails {
   constructor(productId, dataSource) {
@@ -19,8 +20,7 @@ export default class ProductDetails {
       .addEventListener("click", this.addProductToCart.bind(this));
   }
 
-
-  // ec -- added lines 23 to 43 to check for duplicate items in cart
+  // ec -- added lines 23 to 44 to check for duplicate items in cart
  addProductToCart() {
   const cartItems = getLocalStorage("so-cart") || [];
 
@@ -40,6 +40,7 @@ export default class ProductDetails {
   }
 
   setLocalStorage("so-cart", cartItems);
+  updateCartCount(); //This updates the cart count in the header
 }
 
   renderProductDetails() {
@@ -68,7 +69,7 @@ function productDetailsTemplate(product) {
   document.querySelector("#add-to-cart").dataset.id = product.Id;
 }
 
-// ec-- added these lines 71 - 91; add safe checks 
+// ec-- added these lines 72 - 92; add safe checks 
 // by errors from missing or differently named fields and ensures the cart always displays something.
 function cartItemTemplate(item) {
   const name = item.Name || item.NameWithoutBrand || "Unnamed product";
